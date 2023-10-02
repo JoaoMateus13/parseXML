@@ -7,15 +7,66 @@ tree = ET.parse(arquivo)
 
 root = tree.getroot()
 
+data_dict = {}
 
+"""
+# Função para remover stopwords
+def removerStopWord(palavras, caminho):
+
+    stopwords_file = caminho
+    with open(stopwords_file, "r", encoding="utf-8") as f:
+        stopwords = [linha.strip() for linha in f]
+
+    result = []
+    for palavra in palavras:
+        if palavra not in stopwords:
+            result.append(palavra)
+    return result
+
+# Itere sobre as páginas
 for page in root.findall('page'):
-    # Acesse os elementos dentro de cada página
-    page_id = page.find('id').text
-    title = page.find('title').text
-    text = page.find('text').text
+    text_element = page.find('text')
+    if text_element is not None:
+        text = text_element.text
+
+        palavras = text.split()
 
 
-    print(page_id)
-    print(title)
-    print('text')
-    print("=" * 50)
+        palavras_sem_stopwords = removerStopWord(palavras, 'stoplist-ingles.txt')
+
+        novo_texto = ' '.join(palavras_sem_stopwords)
+        text_element.text = novo_texto
+
+# Salve o XML modificado
+tree.write("verbetesWikipedia_sem_stopwords.xml")"""
+
+keyword = ''
+while True:
+    busca = input("Digite a busca: ")
+    if keyword != busca:
+        keyword = busca
+        for page in root.findall('page'):
+
+            # Acesse os elementos dentro de cada página
+            page_id = page.find('id').text
+            page_title = page.find('title').text
+            page_text = page.find('text').text
+        
+            keyword_count = page_text.lower().count(keyword)
+
+
+            data_dict[page_id] = {'title': page_title, 'text': page_text, 'keyword': keyword_count}
+
+
+
+
+    elementosOrdenados = dict(
+        sorted(data_dict.items(), key=lambda x: x[1]['keyword'], reverse=True))
+
+
+    sorted_list = list(elementosOrdenados.items())
+
+    primeiro_elemento = sorted_list[0]
+
+    print(primeiro_elemento[0], primeiro_elemento[1]['title'], primeiro_elemento[1]['keyword'])
+
