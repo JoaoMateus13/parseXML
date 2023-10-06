@@ -7,6 +7,8 @@ tree = ET.parse(arquivo)
 
 root = tree.getroot()
 
+cache = {}
+
 data_dict = {}
 
 """
@@ -42,8 +44,8 @@ tree.write("verbetesWikipedia_sem_stopwords.xml")"""
 
 keyword = ''
 while True:
-    busca = input("Digite a busca: ")
-    if keyword != busca:
+    busca = input("Digite a busca: ").lower()
+    if busca not in cache:
         keyword = busca
         for page in root.findall('page'):
 
@@ -57,16 +59,19 @@ while True:
 
             data_dict[page_id] = {'title': page_title, 'text': page_text, 'keyword': keyword_count}
 
+        elementosOrdenados = dict(
+            sorted(data_dict.items(), key=lambda x: x[1]['keyword'], reverse=True))
 
+        cache[keyword] = list(elementosOrdenados.items())
 
+    else:
+        primeiro_elemento = cache[busca][0]
 
-    elementosOrdenados = dict(
-        sorted(data_dict.items(), key=lambda x: x[1]['keyword'], reverse=True))
+        if (primeiro_elemento[1]['keyword'] == 0):
+            print("NÃO TEM NADA COM ISSO AI OH")
+            print(primeiro_elemento[0], primeiro_elemento[1]['keyword'] == 0)
+            cache.pop(busca)
 
-
-    sorted_list = list(elementosOrdenados.items())
-
-    primeiro_elemento = sorted_list[0]
-
-    print(primeiro_elemento[0], primeiro_elemento[1]['title'], primeiro_elemento[1]['keyword'])
+        else:
+            print(primeiro_elemento[0], primeiro_elemento[1]['title'], primeiro_elemento[1]['keyword'])
 
