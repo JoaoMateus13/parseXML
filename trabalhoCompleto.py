@@ -18,13 +18,11 @@ i = 1
 palavras_encontradas = set()
 for page in root.findall('page'):
 
-    # Acesse os elementos dentro de cada página
-    page_id = page.find('id').text
+    # Acessa as palavras do titulo
     page_title = page.find('title').text.lower()
-    page_text = page.find('text').text.lower()
 
     # pega o titulo e o texto da page
-    palavras = page_title.split() + page_text.split()
+    palavras = page_title.split()
     for palavra in palavras:
         # verifica se é uma palavra maior que 4 caracteres e se a palavra é composta por letras
         if len(palavra) > 4 and palavra.isalpha():
@@ -38,11 +36,15 @@ lista = sorted(list(palavras_encontradas))
 # delimita a quantidade de palavras para ser armazenado em hash
 primeiros_10000 = set(itertools.islice(lista, 100000))
 
+qntPagina = int(input("Digite a quantidade de paginas (quanto maior a quantidade de pagina mais demorado a busca completa): "))
+
+
+#Hash invertida
 for palavra in primeiros_10000:
     if palavra not in parseCompleto:
         data_dict = {}
         # delimita a quantidade de pagina que ele vai verificar a ocorrencia da palavra
-        for page in itertools.islice(root.findall('page'), 5):
+        for page in itertools.islice(root.findall('page'), qntPagina):
 
             # Acesse os elementos dentro de cada página
             page_id = page.find('id').text
@@ -51,7 +53,7 @@ for palavra in primeiros_10000:
 
             # conta a quantidade de ocorrencia da palavra no titulo/texto e calculando os pesos
             keyword_count = page_text.lower().count(
-                palavra)*10 + page_title.lower().count(palavra)*20
+                palavra)*10 + page_title.lower().count(palavra)
 
             # cria um dicionario da pagina com o número de pontos feitos pela ocorrencia daquela palavra
             # só é criado se tiver ocorrencia da palavra naquela pagina
@@ -73,6 +75,7 @@ for palavra in primeiros_10000:
 
 while True:
     busca = input("Digite a busca: ").lower()
+
 
     # A frase é divida em um vetor
     buscaComposta = busca.split()
